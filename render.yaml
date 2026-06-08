@@ -1,13 +1,12 @@
 services:
   - type: web
     name: sportscenter-api
-    env: java
+    env: docker
     region: singapore
     plan: free
     branch: main
-    buildCommand: ./mvnw clean package -DskipTests
-    startCommand: java -jar target/sportscenter-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
     healthCheckPath: /api/products?page=0&size=1
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
