@@ -1,0 +1,66 @@
+services:
+  - type: web
+    name: sportscenter-api
+    env: java
+    region: singapore
+    plan: free
+    branch: main
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/sportscenter-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
+    healthCheckPath: /api/products?page=0&size=1
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SERVER_PORT
+        value: 8081
+      - key: DB_URL
+        fromDatabase:
+          name: sportscenter-db
+          property: connectionString
+      - key: DB_USERNAME
+        fromDatabase:
+          name: sportscenter-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: sportscenter-db
+          property: password
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: sportscenter-redis
+          property: connectionString
+
+  - type: web
+    name: sportscenter-frontend
+    env: static
+    region: singapore
+    branch: main
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    pullRequestPreviewsEnabled: true
+    envVars:
+      - key: VITE_API_URL
+        value: https://sportscenter-api.onrender.com/api
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+databases:
+  - name: sportscenter-db
+    region: singapore
+    plan: free
+    databaseName: sportscenter
+    user: sportscenter
+    version: "16"
+
+redis:
+  - name: sportscenter-redis
+    region: singapore
+    plan: free
+    maxmemoryPolicy: noeviction

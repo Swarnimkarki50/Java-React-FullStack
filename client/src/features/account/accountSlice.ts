@@ -17,21 +17,21 @@ const initialState: AccountState = {
 
 export const signInUser = createAsyncThunk<User, FieldValues>(
     'auth/login',
-    async (data, thunkAPI) => {
+    async (data, _thunkAPI) => {
         try{
             const user = await agent.Account.login(data);
             localStorage.setItem('user', JSON.stringify(user));
             return user;
         }
         catch(error: any){
-            return thunkAPI.rejectWithValue({error: error.data})
+            return _thunkAPI.rejectWithValue({error: error.data})
         }
     }
 )
 
 export const fetchCurrentUser = createAsyncThunk<User | null>(
     'auth/fetchCurrentUser',
-    async(_, thunkAPI) =>{
+    async(_, _thunkAPI) =>{
         try{
             //Retrieve user data from local storage
             const userString = localStorage.getItem('user');
@@ -50,7 +50,7 @@ export const fetchCurrentUser = createAsyncThunk<User | null>(
 
 export const logoutUser = createAsyncThunk<void>(
     'auth/logout',
-    async(_, thunkAPI) =>{
+    async(_, _thunkAPI) =>{
         try{
             //Remove user from local storage
             localStorage.removeItem('user');
